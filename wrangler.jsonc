@@ -1,0 +1,21 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "electric-kitchen",
+  "main": "src/worker/index.ts",
+  "compatibility_date": "2026-10-29",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    // Only /api/* runs the Worker code. Everything else is served straight from static files.
+    "run_worker_first": ["/api/*"],
+    "not_found_handling": "404-page"
+  },
+  // No IDs needed here. Wrangler creates these on first deploy and remembers them.
+  "d1_databases": [
+    { "binding": "DB", "database_name": "electric-kitchen-db", "migrations_dir": "migrations" }
+  ],
+  "r2_buckets": [
+    { "binding": "PHOTOS", "bucket_name": "electric-kitchen-photos" }
+  ],
+  "observability": { "enabled": true }
+}
