@@ -1,21 +1,33 @@
 ---
+import Base from '../layouts/Base.astro';
 ---
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>All-Electric Kitchens</title>
-    <meta name="description" content="A public list of commercial kitchens that cook without gas." />
-    <style>
-      :root { color-scheme: light dark; }
-      body { font-family: system-ui, sans-serif; max-width: 40rem; margin: 4rem auto; padding: 0 1rem; line-height: 1.5; }
-    </style>
-  </head>
-  <body>
-    <main>
-      <h1>All-Electric Kitchens</h1>
-      <p>A public list of commercial kitchens that cook without gas. Coming soon.</p>
-    </main>
-  </body>
-</html>
+<Base>
+  <h1>Kitchens that cook without gas</h1>
+  <p class="lead">A public list of commercial kitchens that run entirely on electric equipment. Proof that it works, in restaurants, schools, hospitals and more.</p>
+  <p><span class="count" id="count" aria-live="polite">Loading…</span></p>
+  <div id="map" class="map" role="region" aria-label="Map of all-electric kitchens"></div>
+  <p class="status" id="error" role="alert" hidden></p>
+  <h2>Newest additions</h2>
+  <ul class="cards" id="newest"></ul>
+</Base>
+
+<script>
+  import { fetchKitchens, kitchenCard } from '../lib/shared';
+  import { showMap } from '../scripts/map';
+
+  const count = document.getElementById('count')!;
+  const error = document.getElementById('error')!;
+  const newest = document.getElementById('newest')!;
+  const mapEl = document.getElementById('map')!;
+
+  try {
+    const kitchens = await fetchKitchens();
+    count.textContent = `${kitchens.length} all-electric ${kitchens.length === 1 ? 'kitchen' : 'kitchens'} listed`;
+    showMap(mapEl, kitchens);
+    newest.append(...kitchens.slice(0, 6).map(kitchenCard));
+  } catch {
+    count.textContent = '';
+    error.hidden = false;
+    error.textContent = 'Sorry, the kitchen list could not be loaded. Please try again later.';
+  }
+</script>

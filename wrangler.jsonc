@@ -10,9 +10,9 @@
     "run_worker_first": ["/api/*"],
     "not_found_handling": "404-page"
   },
-  // No IDs needed here. Wrangler creates these on first deploy and remembers them.
+  // The database ID is not a secret. It only names the database inside our own account.
   "d1_databases": [
-    { "binding": "DB", "database_name": "electric-kitchen-db", "migrations_dir": "migrations" }
+    { "binding": "DB", "database_name": "electric-kitchen-db", "database_id": "ba50ed2c-6a8d-4e14-9fb5-4318fbcc8998", "migrations_dir": "migrations" }
   ],
   "r2_buckets": [
     { "binding": "PHOTOS", "bucket_name": "electric-kitchen-photos" }

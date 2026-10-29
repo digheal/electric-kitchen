@@ -1,0 +1,61 @@
+---
+import Base from '../../layouts/Base.astro';
+import { KITCHEN_TYPES, EQUIPMENT } from '../../lib/shared';
+---
+<Base title="Browse" description="Search and filter all-electric commercial kitchens.">
+  <h1>Browse kitchens</h1>
+  <form class="filters" id="filters" role="search" aria-label="Filter kitchens">
+    <div><label for="q">Search</label><input id="q" name="q" type="search" placeholder="Name or city" /></div>
+    <div>
+      <label for="type">Kitchen type</label>
+      <select id="type" name="type"><option value="">All types</option>{KITCHEN_TYPES.map((t) => <option value={t}>{t}</option>)}</select>
+    </div>
+    <div><label for="state">State / region</label><select id="state" name="state"><option value="">All</option></select></div>
+    <div>
+      <label for="equipment">Equipment</label>
+      <select id="equipment" name="equipment"><option value="">Any</option>{EQUIPMENT.map((t) => <option value={t}>{t}</option>)}</select>
+    </div>
+    <div>
+      <label for="sort">Sort by</label>
+      <select id="sort" name="sort"><option value="newest">Newest</option><option value="name">Name</option></select>
+    </div>
+  </form>
+  <p class="status" id="status" role="status" aria-live="polite">Loading…</p>
+  <ul class="cards" id="results"></ul>
+</Base>
+
+<script>
+  import { fetchKitchens, kitchenCard } from '../../lib/shared';
+
+  const form = document.getElementById('filters') as HTMLFormElement;
+  const status = document.getElementById('status')!;
+  const results = document.getElementById('results')!;
+  const stateSelect = document.getElementById('state') as HTMLSelectElement;
+
+  // The region list comes from the data itself, so it grows as kitchens are added.
+  async function fillRegions() {
+    try {
+      const regions = [...new Set((await fetchKitchens()).map((k) => k.region))].sort();
+      for (const r of regions) stateSelect.append(new Option(r, r));
+    } catch { /* the main load below reports the error */ }
+  }
+
+  async function load() {
+    const params = Object.fromEntries(new FormData(form).entries()) as Record<string, string>;
+    try {
+      const kitchens = await fetchKitchens(params);
+      results.replaceChildren(...kitchens.map(kitchenCard));
+      status.textContent = kitchens.length
+        ? `${kitchens.length} ${kitchens.length === 1 ? 'kitchen' : 'kitchens'} found`
+        : 'No kitchens match those filters.';
+    } catch {
+      status.textContent = 'Sorry, the kitchen list could not be loaded. Please try again later.';
+    }
+  }
+
+  let timer: number | undefined;
+  form.addEventListener('input', () => { clearTimeout(timer); timer = window.setTimeout(load, 250); });
+  form.addEventListener('submit', (e) => { e.preventDefault(); load(); });
+  fillRegions();
+  load();
+</script>

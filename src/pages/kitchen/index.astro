@@ -1,0 +1,65 @@
+---
+import Base from '../../layouts/Base.astro';
+---
+<Base title="Kitchen">
+  <p><a href="/browse/">← Back to browse</a></p>
+  <p class="status" id="status" role="status">Loading…</p>
+  <article id="detail" hidden>
+    <h1 id="name"></h1>
+    <p class="meta" id="sub"></p>
+    <div id="map" class="map small" role="region" aria-label="Map showing this kitchen" hidden></div>
+    <dl class="facts" id="facts"></dl>
+    <h2>Equipment</h2>
+    <ul class="tags" id="equipment" aria-label="Equipment"></ul>
+    <div id="notes-wrap" hidden><h2>Notes</h2><p id="notes"></p></div>
+  </article>
+</Base>
+
+<script>
+  import { el, place, type Kitchen } from '../../lib/shared';
+  import { showMap } from '../../scripts/map';
+
+  const status = document.getElementById('status')!;
+  const id = new URLSearchParams(location.search).get('id');
+
+  function fact(facts: HTMLElement, label: string, value: string | Node | null) {
+    if (value) facts.append(el('dt', {}, label), el('dd', {}, value));
+  }
+
+  async function load() {
+    const res = id && /^\d+$/.test(id) ? await fetch(`/api/kitchens/${id}`) : null;
+    if (!res || !res.ok) { status.textContent = 'We could not find that kitchen.'; return; }
+    const k: Kitchen = await res.json();
+
+    document.title = `${k.name} · All-Electric Kitchens`;
+    document.getElementById('name')!.textContent = k.name;
+    document.getElementById('sub')!.textContent = `${k.kitchen_type} · ${place(k)}`;
+
+    const facts = document.getElementById('facts')!;
+    const address = [k.street_address, k.city, k.region, k.country].filter(Boolean).join(', ');
+    fact(facts, 'Address', address);
+    if (k.website && /^https?:\/\//i.test(k.website)) {
+      fact(facts, 'Website', el('a', { href: k.website, rel: 'noopener noreferrer' }, k.website));
+    }
+    if (k.year_electric) fact(facts, 'Went electric', String(k.year_electric));
+    if (k.build_type !== 'unknown') fact(facts, 'Built', k.build_type === 'converted' ? 'Converted from gas' : 'New build');
+    if (k.approved_at) fact(facts, 'Added', new Date(k.approved_at.replace(' ', 'T') + 'Z').toLocaleDateString(undefined, { dateStyle: 'medium' }));
+
+    const items = [...k.equipment, ...(k.equipment_other ? [k.equipment_other] : [])];
+    document.getElementById('equipment')!.append(...items.map((e) => el('li', {}, e)));
+
+    if (k.notes) {
+      document.getElementById('notes')!.textContent = k.notes;
+      document.getElementById('notes-wrap')!.hidden = false;
+    }
+    if (k.lat != null && k.lng != null) {
+      const mapEl = document.getElementById('map')!;
+      mapEl.hidden = false;
+      showMap(mapEl, [k]);
+    }
+    status.hidden = true;
+    document.getElementById('detail')!.hidden = false;
+  }
+
+  load().catch(() => { status.textContent = 'Sorry, this kitchen could not be loaded. Please try again later.'; });
+</script>

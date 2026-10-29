@@ -13,6 +13,12 @@ npm run preview
 ## Deploy
 
 Pushes to `main` deploy through Cloudflare Workers Builds.
+The deploy command is `npm run deploy`. It builds the site, applies any new
+database migrations from `migrations/`, then publishes the Worker.
+
+## Sample data
+
+`migrations/0002_sample_kitchens.sql` adds five fake kitchens. Remove them before launch.
 
 ## Secrets
 
