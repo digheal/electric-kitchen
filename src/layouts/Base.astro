@@ -18,66 +18,101 @@ const path = Astro.url.pathname;
     <a class="skip" href="#main">Skip to content</a>
     <header class="site-header">
       <div class="wrap bar">
-        <a class="brand" href="/">All-Electric Kitchens</a>
+        <a class="brand" href="/"><span class="bolt" aria-hidden="true">⚡</span> All-Electric Kitchens</a>
         <nav aria-label="Main">
-          <a href="/" aria-current={path === '/' ? 'page' : undefined}>Home</a>
+          <a href="/" aria-current={path === '/' ? 'page' : undefined}>Globe</a>
           <a href="/browse/" aria-current={path.startsWith('/browse') ? 'page' : undefined}>Browse</a>
         </nav>
       </div>
     </header>
-    <main id="main" class="wrap"><slot /></main>
-    <footer class="site-footer"><div class="wrap">Kitchens that cook without gas. Listings are reviewed before they appear.</div></footer>
+    <main id="main"><slot /></main>
+    <footer class="site-footer"><div class="wrap">Kitchens that cook without gas. Every listing is reviewed before it appears.</div></footer>
   </body>
 </html>
 
 <style is:global>
   :root {
-    --bg: #faf7f2; --surface: #ffffff; --text: #1c2625; --muted: #56625f; --line: #ddd6ca;
-    --accent: #0b6b6b; --accent-text: #ffffff; --spark: #f6b93b;
+    --bg: #f6f7f5; --surface: #ffffff; --text: #0f1b1a; --muted: #55625f; --line: #e0e4e1;
+    --accent: #0b6b6b; --accent-text: #ffffff; --spark: #f6b93b; --space: #060b10;
+    --radius: 1rem; --shadow: 0 1px 2px rgba(15,27,26,.06), 0 8px 24px rgba(15,27,26,.06);
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #111919; --surface: #1a2423; --text: #eef2f0; --muted: #a6b3af; --line: #2d3b39;
-      --accent: #5cc7c0; --accent-text: #0c1514; --spark: #f6b93b;
+      --bg: #0b1213; --surface: #131c1d; --text: #eef3f1; --muted: #a2b0ac; --line: #243230;
+      --accent: #5cc7c0; --accent-text: #0a1413; --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
     }
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--text); font: 1rem/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
-  h1, h2, h3, .brand { font-family: Georgia, "Times New Roman", serif; line-height: 1.2; }
-  h1 { font-size: clamp(1.9rem, 5vw, 2.8rem); margin: 0 0 .5rem; }
-  h2 { font-size: 1.4rem; margin: 2rem 0 .75rem; }
-  h3 { font-size: 1.1rem; margin: 0; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 1rem/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
+  h1, h2, h3 { font-weight: 700; letter-spacing: -0.025em; line-height: 1.15; }
+  h1 { font-size: clamp(2rem, 5.5vw, 3.25rem); margin: 0 0 .6rem; }
+  h2 { font-size: 1.5rem; margin: 2.5rem 0 1rem; }
+  h3 { font-size: 1.05rem; margin: 0; letter-spacing: -0.01em; }
   a { color: var(--accent); }
   a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid var(--spark); outline-offset: 2px; }
-  .wrap { max-width: 64rem; margin: 0 auto; padding: 0 1rem; }
+  .wrap { max-width: 68rem; margin: 0 auto; padding: 0 1.25rem; }
   .skip { position: absolute; left: -999px; top: 0; background: var(--accent); color: var(--accent-text); padding: .5rem 1rem; z-index: 1000; }
   .skip:focus { left: 0; }
-  .site-header { border-bottom: 1px solid var(--line); background: var(--surface); }
-  .bar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 3.5rem; flex-wrap: wrap; }
-  .brand { font-weight: 700; font-size: 1.15rem; text-decoration: none; color: var(--text); }
-  nav a { margin-left: 1rem; color: var(--text); text-decoration: none; padding: .5rem 0; display: inline-block; }
-  nav a[aria-current] { border-bottom: 3px solid var(--spark); }
-  main { padding-top: 1.5rem; padding-bottom: 3rem; min-height: 60vh; }
-  .site-footer { border-top: 1px solid var(--line); color: var(--muted); padding: 1.25rem 0; font-size: .9rem; }
-  .lead { font-size: 1.15rem; color: var(--muted); max-width: 40rem; margin: 0 0 1rem; }
-  .count { display: inline-block; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: .25rem .9rem; font-weight: 600; }
-  .map { height: 22rem; border-radius: .75rem; border: 1px solid var(--line); margin: 1rem 0; z-index: 0; }
-  .map.small { height: 16rem; }
-  .cards { list-style: none; padding: 0; margin: 0; display: grid; gap: .75rem; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); }
-  .card { background: var(--surface); border: 1px solid var(--line); border-radius: .75rem; padding: 1rem; }
-  .card a { text-decoration: none; }
-  .card a:hover { text-decoration: underline; }
-  .meta { color: var(--muted); margin: .25rem 0 .5rem; font-size: .95rem; }
-  .tags { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: .35rem; }
-  .tags li { background: color-mix(in srgb, var(--accent) 14%, transparent); border-radius: 999px; padding: .1rem .65rem; font-size: .85rem; }
-  .filters { display: grid; gap: .75rem; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); margin: 1rem 0; }
-  .filters label { display: block; font-size: .9rem; font-weight: 600; margin-bottom: .25rem; }
-  input, select { width: 100%; font: inherit; padding: .6rem .7rem; min-height: 2.75rem; border: 1px solid var(--muted); border-radius: .5rem; background: var(--surface); color: var(--text); }
+
+  .site-header { position: sticky; top: 0; z-index: 20; background: color-mix(in srgb, var(--bg) 82%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
+  .bar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 3.5rem; }
+  .brand { font-weight: 700; letter-spacing: -0.02em; text-decoration: none; color: var(--text); }
+  .bolt { color: var(--spark); }
+  nav a { margin-left: .25rem; color: var(--text); text-decoration: none; padding: .45rem .9rem; display: inline-block; border-radius: 999px; font-weight: 500; }
+  nav a:hover { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+  nav a[aria-current] { background: var(--accent); color: var(--accent-text); }
+  main { min-height: 60vh; padding-bottom: 3rem; }
+  .page { padding-top: 2rem; }
+  .site-footer { border-top: 1px solid var(--line); color: var(--muted); padding: 1.5rem 0; font-size: .9rem; }
+
+  .btn { display: inline-flex; align-items: center; min-height: 2.75rem; padding: 0 1.3rem; border-radius: 999px; background: var(--spark); color: #1b1300; font-weight: 600; text-decoration: none; border: 0; cursor: pointer; font: inherit; font-weight: 600; }
+  .btn:hover { filter: brightness(1.05); }
+
+  /* Globe hero */
+  .hero { position: relative; height: min(82svh, 48rem); min-height: 32rem; background: radial-gradient(ellipse at 65% 45%, #11222e 0%, var(--space) 70%); overflow: hidden; }
+  .hero-map { position: absolute; inset: 0; }
+  .hero-card { position: absolute; z-index: 5; top: 1.25rem; left: 1.25rem; max-width: 24rem; padding: 1.4rem 1.5rem; color: #fff; border-radius: 1.25rem; background: rgba(6,11,16,.8); border: 1px solid rgba(255,255,255,.14); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+  .hero-card h1 { font-size: clamp(1.7rem, 4.4vw, 2.5rem); color: #fff; }
+  .hero-card p { margin: 0 0 1rem; color: rgba(255,255,255,.82); }
+  .hero-card .count { font-weight: 600; color: var(--spark); margin-bottom: 1rem; }
+  .spin-btn { position: absolute; z-index: 5; top: 1.25rem; right: 4.2rem; min-height: 2.5rem; padding: 0 1rem; border-radius: 999px; border: 1px solid rgba(255,255,255,.25); background: rgba(6,11,16,.84); color: #fff; font: inherit; font-size: .9rem; cursor: pointer; backdrop-filter: blur(12px); }
+  .rail { position: absolute; z-index: 5; left: 0; right: 0; bottom: 1.7rem; display: flex; gap: .6rem; overflow-x: auto; margin: 0; padding: .4rem 1.25rem .6rem; list-style: none; scrollbar-width: thin; }
+  .rail button { white-space: nowrap; min-height: 2.75rem; padding: 0 1.1rem; border-radius: 999px; border: 1px solid rgba(255,255,255,.2); background: rgba(6,11,16,.84); color: #fff; font: inherit; font-size: .92rem; cursor: pointer; backdrop-filter: blur(10px); }
+  .rail button:hover { background: #1d3a40; }
+  .hero .error { position: absolute; z-index: 6; inset: auto 1.25rem 5rem; color: #fff; }
+  .maplibregl-popup-content { padding: 1rem 1.1rem; border-radius: .9rem; font-family: inherit; color: #0f1b1a; }
+  .popup { display: grid; gap: .2rem; }
+  .popup span { color: #4a5754; font-size: .9rem; }
+  .popup a { color: #0b6b6b; font-weight: 600; }
+  .maplibregl-ctrl-group { border-radius: .75rem; }
+  .hero .maplibregl-ctrl-attrib { background: rgba(6,11,16,.7); color: #cfd8d5; }
+  .hero .maplibregl-ctrl-attrib a { color: #fff; }
+
+  .map-small { position: relative; height: 18rem; border-radius: var(--radius); overflow: hidden; margin: 1.25rem 0; border: 1px solid var(--line); }
+  .map-small > div { position: absolute; inset: 0; }
+
+  /* Cards and filters */
+  .cards { list-style: none; padding: 0; margin: 0; display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.25rem; box-shadow: var(--shadow); transition: transform .15s ease; }
+  .card:hover { transform: translateY(-2px); }
+  .card a { color: var(--text); text-decoration: none; }
+  .card a:hover { color: var(--accent); }
+  .meta { color: var(--muted); margin: .3rem 0 .8rem; font-size: .95rem; }
+  .tags { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: .4rem; }
+  .tags li { background: color-mix(in srgb, var(--accent) 13%, transparent); border-radius: 999px; padding: .15rem .7rem; font-size: .84rem; }
+  .filters { display: grid; gap: .9rem; grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr)); margin: 1.25rem 0 1.5rem; padding: 1.1rem; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+  .filters label { display: block; font-size: .85rem; font-weight: 600; margin-bottom: .3rem; }
+  input, select { width: 100%; font: inherit; padding: .6rem .8rem; min-height: 2.75rem; border: 1px solid var(--muted); border-radius: .7rem; background: var(--bg); color: var(--text); }
   .status, .empty { color: var(--muted); }
-  dl.facts { display: grid; grid-template-columns: max-content 1fr; gap: .4rem 1.25rem; margin: 1rem 0; }
+  dl.facts { display: grid; grid-template-columns: max-content 1fr; gap: .5rem 1.5rem; margin: 1.25rem 0; }
   dl.facts dt { font-weight: 600; } dl.facts dd { margin: 0; }
-  .pin span { display: block; width: 22px; height: 22px; border-radius: 50%; background: var(--accent); border: 3px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.5); }
-  .pin:focus-visible span { outline: 3px solid var(--spark); }
-  .leaflet-container { font-family: inherit; }
-  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; scroll-behavior: auto !important; } .leaflet-fade-anim .leaflet-popup, .leaflet-zoom-anim .leaflet-zoom-animated { transition: none !important; } }
+
+  @media (max-width: 640px) {
+    .hero { min-height: 30rem; }
+    .hero-card { right: 4rem; max-width: none; padding: 1.1rem 1.2rem; }
+    .hero-card .lead { display: none; }
+    .spin-btn { top: auto; right: 1.25rem; bottom: 5.3rem; }
+    nav a { padding: .45rem .7rem; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
 </style>

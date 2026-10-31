@@ -2,29 +2,45 @@
 import Base from '../layouts/Base.astro';
 ---
 <Base>
-  <h1>Kitchens that cook without gas</h1>
-  <p class="lead">A public list of commercial kitchens that run entirely on electric equipment. Proof that it works, in restaurants, schools, hospitals and more.</p>
-  <p><span class="count" id="count" aria-live="polite">Loading…</span></p>
-  <div id="map" class="map" role="region" aria-label="Map of all-electric kitchens"></div>
-  <p class="status" id="error" role="alert" hidden></p>
-  <h2>Newest additions</h2>
-  <ul class="cards" id="newest"></ul>
+  <section class="hero" aria-label="Globe of all-electric kitchens">
+    <div id="map" class="hero-map" role="region" aria-label="Interactive globe. Each yellow dot is an all-electric kitchen. The same kitchens are listed in the buttons along the bottom."></div>
+    <div class="hero-card">
+      <h1>Kitchens that cook without gas</h1>
+      <p class="lead">A public list of commercial kitchens that run entirely on electric equipment. Proof that it works.</p>
+      <p class="count" id="count" aria-live="polite">Loading…</p>
+      <a class="btn" href="/browse/">Browse all kitchens</a>
+    </div>
+    <button type="button" class="spin-btn" id="spin" aria-pressed="false">Pause rotation</button>
+    <ul class="rail" id="rail" aria-label="Jump to a kitchen"></ul>
+    <p class="error" id="error" role="alert" hidden></p>
+  </section>
+  <div class="wrap">
+    <h2>Newest additions</h2>
+    <ul class="cards" id="newest"></ul>
+  </div>
 </Base>
 
 <script>
-  import { fetchKitchens, kitchenCard } from '../lib/shared';
-  import { showMap } from '../scripts/map';
+  import { el, fetchKitchens, kitchenCard } from '../lib/shared';
+  import { showGlobe } from '../scripts/map';
 
   const count = document.getElementById('count')!;
   const error = document.getElementById('error')!;
-  const newest = document.getElementById('newest')!;
-  const mapEl = document.getElementById('map')!;
 
   try {
     const kitchens = await fetchKitchens();
     count.textContent = `${kitchens.length} all-electric ${kitchens.length === 1 ? 'kitchen' : 'kitchens'} listed`;
-    showMap(mapEl, kitchens);
-    newest.append(...kitchens.slice(0, 6).map(kitchenCard));
+    const hero = showGlobe(document.getElementById('map')!, kitchens, document.getElementById('spin') as HTMLButtonElement);
+    document.getElementById('rail')!.append(
+      ...kitchens
+        .filter((k) => k.lat != null)
+        .map((k) => {
+          const b = el('button', { type: 'button' }, k.name);
+          b.addEventListener('click', () => hero.focus(k));
+          return el('li', {}, b);
+        }),
+    );
+    document.getElementById('newest')!.append(...kitchens.slice(0, 6).map(kitchenCard));
   } catch {
     count.textContent = '';
     error.hidden = false;

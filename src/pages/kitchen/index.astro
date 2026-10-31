@@ -2,22 +2,24 @@
 import Base from '../../layouts/Base.astro';
 ---
 <Base title="Kitchen">
+  <div class="wrap page">
   <p><a href="/browse/">← Back to browse</a></p>
   <p class="status" id="status" role="status">Loading…</p>
   <article id="detail" hidden>
     <h1 id="name"></h1>
     <p class="meta" id="sub"></p>
-    <div id="map" class="map small" role="region" aria-label="Map showing this kitchen" hidden></div>
+    <div id="mapbox" class="map-small" hidden><div id="map" role="region" aria-label="Map showing this kitchen"></div></div>
     <dl class="facts" id="facts"></dl>
     <h2>Equipment</h2>
     <ul class="tags" id="equipment" aria-label="Equipment"></ul>
     <div id="notes-wrap" hidden><h2>Notes</h2><p id="notes"></p></div>
   </article>
+  </div>
 </Base>
 
 <script>
   import { el, place, type Kitchen } from '../../lib/shared';
-  import { showMap } from '../../scripts/map';
+  import { showKitchenMap } from '../../scripts/map';
 
   const status = document.getElementById('status')!;
   const id = new URLSearchParams(location.search).get('id');
@@ -53,9 +55,8 @@ import Base from '../../layouts/Base.astro';
       document.getElementById('notes-wrap')!.hidden = false;
     }
     if (k.lat != null && k.lng != null) {
-      const mapEl = document.getElementById('map')!;
-      mapEl.hidden = false;
-      showMap(mapEl, [k]);
+      document.getElementById('mapbox')!.hidden = false;
+      showKitchenMap(document.getElementById('map')!, k);
     }
     status.hidden = true;
     document.getElementById('detail')!.hidden = false;

@@ -3,6 +3,7 @@ import Base from '../../layouts/Base.astro';
 import { KITCHEN_TYPES, EQUIPMENT } from '../../lib/shared';
 ---
 <Base title="Browse" description="Search and filter all-electric commercial kitchens.">
+  <div class="wrap page">
   <h1>Browse kitchens</h1>
   <form class="filters" id="filters" role="search" aria-label="Filter kitchens">
     <div><label for="q">Search</label><input id="q" name="q" type="search" placeholder="Name or city" /></div>
@@ -22,6 +23,7 @@ import { KITCHEN_TYPES, EQUIPMENT } from '../../lib/shared';
   </form>
   <p class="status" id="status" role="status" aria-live="polite">Loading…</p>
   <ul class="cards" id="results"></ul>
+  </div>
 </Base>
 
 <script>
