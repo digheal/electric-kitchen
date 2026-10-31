@@ -6,7 +6,29 @@ maplibregl.setWorkerUrl('/maplibre/maplibre-gl-worker.mjs');
 
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+const OSM_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+const NASA_ATTRIBUTION = 'Imagery &copy; <a href="https://earthdata.nasa.gov/gibs">NASA GIBS</a> Blue Marble';
+const darkMode = () => window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+// The glow around the globe. Pale in light mode, deeper blue in dark mode.
+const sky = (dark: boolean) => ({
+  'sky-color': dark ? '#1b4f8f' : '#8fc1f0',
+  'horizon-color': dark ? '#3b86d1' : '#cfe6fa',
+  'fog-color': dark ? '#0b1b2b' : '#ffffff',
+  'sky-horizon-blend': 0.7,
+  'atmosphere-blend': ['interpolate', ['linear'], ['zoom'], 0, 1, 5, 1, 7, 0],
+});
+
 function createMap(container: HTMLElement, globe: boolean, center: [number, number], zoom: number) {
+  // The globe uses NASA satellite imagery, with street detail fading in as you zoom close.
+  // Flat maps (a single kitchen's page) use plain streets, which are easier to navigate.
+  const layers: any[] = globe
+    ? [
+        { id: 'earth', type: 'raster', source: 'earth' },
+        { id: 'streets', type: 'raster', source: 'osm', minzoom: 4.5, paint: { 'raster-opacity': ['interpolate', ['linear'], ['zoom'], 4.5, 0, 7, 1] } },
+      ]
+    : [{ id: 'streets', type: 'raster', source: 'osm' }];
+
   const map = new maplibregl.Map({
     container,
     center,
@@ -19,23 +41,33 @@ function createMap(container: HTMLElement, globe: boolean, center: [number, numb
     style: {
       version: 8,
       projection: { type: globe ? 'globe' : 'mercator' },
-      sky: { 'atmosphere-blend': ['interpolate', ['linear'], ['zoom'], 0, 1, 5, 1, 7, 0] },
+      sky: sky(darkMode()),
       sources: {
-        osm: {
+        osm: { type: 'raster', tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'], tileSize: 256, maxzoom: 19, attribution: OSM_ATTRIBUTION },
+        earth: {
           type: 'raster',
-          tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+          tiles: ['https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/BlueMarble_ShadedRelief_Bathymetry/default/GoogleMapsCompatible_Level8/{z}/{y}/{x}.jpeg'],
           tileSize: 256,
-          maxzoom: 19,
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+          maxzoom: 8,
+          attribution: NASA_ATTRIBUTION,
         },
       },
-      layers: [
-        { id: 'ocean', type: 'background', paint: { 'background-color': '#9cc3d5' } },
-        { id: 'osm', type: 'raster', source: 'osm' },
-      ],
-    },
+      layers: [{ id: 'ocean', type: 'background', paint: { 'background-color': '#6f9fc4' } }, ...layers],
+    } as unknown as maplibregl.StyleSpecification,
   });
   map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
+
+  if (globe) {
+    // If the satellite tiles can't be reached, fall back to the street map at every zoom.
+    let fellBack = false;
+    map.on('error', (e: any) => {
+      if (fellBack || e?.sourceId !== 'earth') return;
+      fellBack = true;
+      map.setLayerZoomRange('streets', 0, 24);
+      map.setPaintProperty('streets', 'raster-opacity', 1);
+    });
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => map.setSky(sky(darkMode()) as any));
+  }
   return map;
 }
 
@@ -129,7 +161,7 @@ export function showGlobe(container: HTMLElement, kitchens: Kitchen[], spinButto
   let popup: maplibregl.Popup | undefined;
   const focus = (k: Kitchen) => {
     popup?.remove();
-    map.flyTo({ center: [k.lng!, k.lat!], zoom: 5.5, duration: reducedMotion() ? 0 : 2500, essential: true });
+    map.flyTo({ center: [k.lng!, k.lat!], zoom: 8, duration: reducedMotion() ? 0 : 2500, essential: true });
     map.once('moveend', () => { popup = popupFor(map, k); });
   };
   map.on('load', () => {

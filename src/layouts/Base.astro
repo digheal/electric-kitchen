@@ -34,11 +34,15 @@ const path = Astro.url.pathname;
   :root {
     --bg: #f6f7f5; --surface: #ffffff; --text: #0f1b1a; --muted: #55625f; --line: #e0e4e1;
     --accent: #0b6b6b; --accent-text: #ffffff; --spark: #f6b93b; --space: #060b10;
+    --hero-bg: var(--bg); --grid: rgba(15,27,26,.09);
+    --glass: rgba(255,255,255,.78); --glass-text: #0f1b1a; --glass-muted: #46544f; --glass-line: rgba(15,27,26,.12); --glass-hover: #ffffff; --glass-accent: #0b6b6b;
     --radius: 1rem; --shadow: 0 1px 2px rgba(15,27,26,.06), 0 8px 24px rgba(15,27,26,.06);
   }
   @media (prefers-color-scheme: dark) {
     :root {
       --bg: #0b1213; --surface: #131c1d; --text: #eef3f1; --muted: #a2b0ac; --line: #243230;
+      --hero-bg: var(--bg); --grid: rgba(255,255,255,.07);
+      --glass: rgba(10,18,24,.78); --glass-text: #ffffff; --glass-muted: rgba(255,255,255,.82); --glass-line: rgba(255,255,255,.16); --glass-hover: #1d3a40; --glass-accent: #f6b93b;
       --accent: #5cc7c0; --accent-text: #0a1413; --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
     }
   }
@@ -69,24 +73,26 @@ const path = Astro.url.pathname;
   .btn:hover { filter: brightness(1.05); }
 
   /* Globe hero */
-  .hero { position: relative; height: min(82svh, 48rem); min-height: 32rem; background: radial-gradient(ellipse at 65% 45%, #11222e 0%, var(--space) 70%); overflow: hidden; }
+  .hero { position: relative; height: min(82svh, 48rem); min-height: 32rem; background: var(--hero-bg); overflow: hidden; }
+  /* Faint grid that fades out toward the edges */
+  .hero::before { content: ""; position: absolute; inset: 0; background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 44px 44px; background-position: center; -webkit-mask-image: radial-gradient(ellipse 62% 62% at 62% 48%, #000 15%, transparent 100%); mask-image: radial-gradient(ellipse 62% 62% at 62% 48%, #000 15%, transparent 100%); pointer-events: none; }
   .hero-map { position: absolute; inset: 0; }
-  .hero-card { position: absolute; z-index: 5; top: 1.25rem; left: 1.25rem; max-width: 24rem; padding: 1.4rem 1.5rem; color: #fff; border-radius: 1.25rem; background: rgba(6,11,16,.8); border: 1px solid rgba(255,255,255,.14); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
-  .hero-card h1 { font-size: clamp(1.7rem, 4.4vw, 2.5rem); color: #fff; }
-  .hero-card p { margin: 0 0 1rem; color: rgba(255,255,255,.82); }
-  .hero-card .count { font-weight: 600; color: var(--spark); margin-bottom: 1rem; }
-  .spin-btn { position: absolute; z-index: 5; top: 1.25rem; right: 4.2rem; min-height: 2.5rem; padding: 0 1rem; border-radius: 999px; border: 1px solid rgba(255,255,255,.25); background: rgba(6,11,16,.84); color: #fff; font: inherit; font-size: .9rem; cursor: pointer; backdrop-filter: blur(12px); }
+  .hero-card { position: absolute; z-index: 5; top: 1.25rem; left: 1.25rem; max-width: 24rem; padding: 1.4rem 1.5rem; color: var(--glass-text); border-radius: 1.25rem; background: var(--glass); border: 1px solid var(--glass-line); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: var(--shadow); }
+  .hero-card h1 { font-size: clamp(1.7rem, 4.4vw, 2.5rem); color: var(--glass-text); }
+  .hero-card p { margin: 0 0 1rem; color: var(--glass-muted); }
+  .hero-card .count { font-weight: 600; color: var(--glass-accent); margin-bottom: 1rem; }
+  .spin-btn { position: absolute; z-index: 5; top: 1.25rem; right: 4.2rem; min-height: 2.5rem; padding: 0 1rem; border-radius: 999px; border: 1px solid var(--glass-line); background: var(--glass); color: var(--glass-text); font: inherit; font-size: .9rem; cursor: pointer; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
   .rail { position: absolute; z-index: 5; left: 0; right: 0; bottom: 1.7rem; display: flex; gap: .6rem; overflow-x: auto; margin: 0; padding: .4rem 1.25rem .6rem; list-style: none; scrollbar-width: thin; }
-  .rail button { white-space: nowrap; min-height: 2.75rem; padding: 0 1.1rem; border-radius: 999px; border: 1px solid rgba(255,255,255,.2); background: rgba(6,11,16,.84); color: #fff; font: inherit; font-size: .92rem; cursor: pointer; backdrop-filter: blur(10px); }
-  .rail button:hover { background: #1d3a40; }
-  .hero .error { position: absolute; z-index: 6; inset: auto 1.25rem 5rem; color: #fff; }
+  .rail button { white-space: nowrap; min-height: 2.75rem; padding: 0 1.1rem; border-radius: 999px; border: 1px solid var(--glass-line); background: var(--glass); color: var(--glass-text); font: inherit; font-size: .92rem; cursor: pointer; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+  .rail button:hover { background: var(--glass-hover); }
+  .hero .error { position: absolute; z-index: 6; inset: auto 1.25rem 5rem; color: var(--glass-text); }
   .maplibregl-popup-content { padding: 1rem 1.1rem; border-radius: .9rem; font-family: inherit; color: #0f1b1a; }
   .popup { display: grid; gap: .2rem; }
   .popup span { color: #4a5754; font-size: .9rem; }
   .popup a { color: #0b6b6b; font-weight: 600; }
   .maplibregl-ctrl-group { border-radius: .75rem; }
-  .hero .maplibregl-ctrl-attrib { background: rgba(6,11,16,.7); color: #cfd8d5; }
-  .hero .maplibregl-ctrl-attrib a { color: #fff; }
+  .hero .maplibregl-ctrl-attrib { background: var(--glass); color: var(--glass-muted); }
+  .hero .maplibregl-ctrl-attrib a { color: var(--glass-text); }
 
   .map-small { position: relative; height: 18rem; border-radius: var(--radius); overflow: hidden; margin: 1.25rem 0; border: 1px solid var(--line); }
   .map-small > div { position: absolute; inset: 0; }
