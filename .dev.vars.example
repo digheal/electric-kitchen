@@ -1,0 +1,5 @@
+# Copy to .dev.vars for local work. Real values go in Cloudflare as Worker secrets, never in git.
+# None of these are read by the code yet. They are reserved for the admin area and submission form.
+ADMIN_PASSWORD=
+RESEND_API_KEY=
+TURNSTILE_SECRET_KEY=
