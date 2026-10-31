@@ -75,7 +75,7 @@ const path = Astro.url.pathname;
   /* Globe hero */
   .hero { position: relative; height: min(82svh, 48rem); min-height: 32rem; background: var(--hero-bg); overflow: hidden; }
   /* Faint grid that fades out toward the edges */
-  .hero::before { content: ""; position: absolute; inset: 0; background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 44px 44px; background-position: center; -webkit-mask-image: radial-gradient(ellipse 62% 62% at 62% 48%, #000 15%, transparent 100%); mask-image: radial-gradient(ellipse 62% 62% at 62% 48%, #000 15%, transparent 100%); pointer-events: none; }
+  .hero::before { content: ""; position: absolute; inset: 0; background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 24px 24px; background-position: center; -webkit-mask-image: radial-gradient(ellipse 62% 62% at 62% 48%, #000 15%, transparent 100%); mask-image: radial-gradient(ellipse 62% 62% at 62% 48%, #000 15%, transparent 100%); pointer-events: none; }
   .hero-map { position: absolute; inset: 0; }
   .hero-card { position: absolute; z-index: 5; top: 1.25rem; left: 1.25rem; max-width: 24rem; padding: 1.4rem 1.5rem; color: var(--glass-text); border-radius: 1.25rem; background: var(--glass); border: 1px solid var(--glass-line); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: var(--shadow); }
   .hero-card h1 { font-size: clamp(1.7rem, 4.4vw, 2.5rem); color: var(--glass-text); }
