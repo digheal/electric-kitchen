@@ -6,8 +6,8 @@ maplibregl.setWorkerUrl('/maplibre/maplibre-gl-worker.mjs');
 
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-const OSM_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
-const NASA_ATTRIBUTION = 'Imagery &copy; <a href="https://earthdata.nasa.gov/gibs">NASA GIBS</a> Blue Marble';
+const OSM_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
+const NASA_ATTRIBUTION = '<a href="https://earthdata.nasa.gov/gibs">NASA GIBS</a>';
 const darkMode = () => window.matchMedia('(prefers-color-scheme: dark)').matches;
 
 // The glow around the globe. Pale in light mode, deeper blue in dark mode.
@@ -38,6 +38,8 @@ function createMap(container: HTMLElement, globe: boolean, center: [number, numb
     attributionControl: { compact: true },
     // Wheel zoom is off so the page can still scroll past the map. Use the +/- buttons or pinch.
     scrollZoom: false,
+    // On phones, one finger scrolls the page and two fingers move the map.
+    cooperativeGestures: window.matchMedia('(pointer: coarse)').matches,
     style: {
       version: 8,
       projection: { type: globe ? 'globe' : 'mercator' },
@@ -118,24 +120,32 @@ function popupFor(map: maplibregl.Map, k: Kitchen) {
 }
 
 /** Slowly turns the globe. Pauses while someone touches the map, and stays off if they ask for less motion. */
-function spinGlobe(map: maplibregl.Map, button: HTMLButtonElement, secondsPerTurn = 240) {
+function spinGlobe(
+  map: maplibregl.Map,
+  button: HTMLButtonElement,
+  padding: () => maplibregl.PaddingOptions,
+  onChange: (paused: boolean) => void,
+  secondsPerTurn = 240,
+) {
   let userPaused = reducedMotion();
   let holding = false;
+  let flying = false;
   let resume: number | undefined;
-  const canSpin = () => !userPaused && !holding && map.getZoom() < 4;
+  const canSpin = () => !userPaused && !holding && !flying && map.getZoom() < 4;
 
   const step = () => {
     if (!canSpin()) return;
     const c = map.getCenter();
     c.lng -= 360 / secondsPerTurn;
-    map.easeTo({ center: c, duration: 1000, easing: (t) => t, essential: true });
+    map.easeTo({ center: c, padding: padding(), duration: 1000, easing: (t) => t, essential: true });
   };
   const hold = () => { holding = true; window.clearTimeout(resume); };
   const release = () => { window.clearTimeout(resume); resume = window.setTimeout(() => { holding = false; step(); }, 4000); };
 
   const paint = () => {
     button.setAttribute('aria-pressed', String(userPaused));
-    button.textContent = userPaused ? 'Start rotation' : 'Pause rotation';
+    button.textContent = userPaused ? 'Start animation' : 'Pause animation';
+    onChange(userPaused);
   };
   button.addEventListener('click', () => { userPaused = !userPaused; paint(); if (!userPaused) { holding = false; step(); } });
 
@@ -146,27 +156,39 @@ function spinGlobe(map: maplibregl.Map, button: HTMLButtonElement, secondsPerTur
   map.on('touchend', release);
   paint();
   step();
+  // Called around a fly-to, so the spin never fights the flight.
+  return { setFlying(value: boolean) { flying = value; } };
 }
 
 export interface Hero { map: maplibregl.Map; focus: (k: Kitchen) => void }
 
-/** The home page globe. */
-export function showGlobe(container: HTMLElement, kitchens: Kitchen[], spinButton: HTMLButtonElement): Hero {
+/** The home page globe. Sits off to the right so about half of it shows, clear of the text card. */
+export function showGlobe(container: HTMLElement, kitchens: Kitchen[], spinButton: HTMLButtonElement, onMotionChange: (paused: boolean) => void): Hero {
   const first = kitchens.find((k) => k.lat != null && k.lng != null);
-  const narrow = window.innerWidth < 700;
-  const map = createMap(container, true, first ? [first.lng!, 20] : [-30, 20], narrow ? 1.1 : 1.95);
-  // Keep the globe clear of the text card: beside it on wide screens, below it on phones.
-  const padding = narrow ? { top: 170, bottom: 120, left: 0, right: 0 } : window.innerWidth > 900 ? { top: 0, bottom: 60, left: 420, right: 0 } : { top: 200, bottom: 100, left: 0, right: 0 };
-  map.jumpTo({ padding });
+  const wide = () => window.innerWidth > 900;
+  // Padding shifts where the map treats "the middle" to be. A big left padding pushes the globe to the right edge.
+  const globePadding = (): maplibregl.PaddingOptions =>
+    wide()
+      ? { top: 0, bottom: 40, left: Math.round(window.innerWidth * 0.8), right: 0 }
+      : { top: 150, bottom: 70, left: Math.round(window.innerWidth * 0.72), right: 0 };
+  // While looking at one kitchen, centre it in the space beside the text card instead.
+  const focusPadding = (): maplibregl.PaddingOptions =>
+    wide() ? { top: 0, bottom: 40, left: 420, right: 0 } : { top: 200, bottom: 90, left: 0, right: 0 };
+
+  const map = createMap(container, true, first ? [first.lng!, 20] : [-30, 20], wide() ? 2.35 : 1.5);
+  map.jumpTo({ padding: globePadding() });
+
   let popup: maplibregl.Popup | undefined;
+  let spin: ReturnType<typeof spinGlobe> | undefined;
   const focus = (k: Kitchen) => {
     popup?.remove();
-    map.flyTo({ center: [k.lng!, k.lat!], zoom: 8, duration: reducedMotion() ? 0 : 2500, essential: true });
-    map.once('moveend', () => { popup = popupFor(map, k); });
+    spin?.setFlying(true);
+    map.flyTo({ center: [k.lng!, k.lat!], zoom: 8, padding: focusPadding(), duration: reducedMotion() ? 0 : 2500, essential: true });
+    map.once('moveend', () => { spin?.setFlying(false); popup = popupFor(map, k); });
   };
   map.on('load', () => {
     addPins(map, kitchens, focus);
-    spinGlobe(map, spinButton);
+    spin = spinGlobe(map, spinButton, globePadding, onMotionChange);
   });
   return { map, focus };
 }
