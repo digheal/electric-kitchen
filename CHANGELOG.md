@@ -4,7 +4,7 @@ Newest first. Each entry names the commit, who asked and why, what changed and a
 
 ## 2026-10-31
 
-### Repository structure and working rules `TODO-hash`
+### Repository structure and working rules `d72394a`
 
 Owner asked to organize this repository the same way as their Kachori Chhori project, with agent rules, docs, tests and CI.
 
