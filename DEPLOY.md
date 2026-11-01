@@ -90,6 +90,8 @@ What is actually set in production. Update this whenever production changes.
 
 ### Migrations applied
 
-1. `0001_init.sql`. TODO: confirm date applied.
-2. `0002_sample_kitchens.sql`. TODO: confirm date applied.
-3. `0003_california_kitchens.sql`. Pushed to `main` on 2026-10-31. TODO: confirm the deploy finished and the migration ran.
+Checked against the production `d1_migrations` table on 2026-11-01. Times are UTC.
+
+1. `0001_init.sql`, applied 2026-10-31 04:48:24.
+2. `0002_sample_kitchens.sql`, applied 2026-10-31 04:48:25.
+3. `0003_california_kitchens.sql`, applied 2026-10-31 05:52:29.

@@ -201,6 +201,7 @@ Not covered by automated tests: `el` and `kitchenCard` (need a DOM), the Astro p
 10. Test files are not typechecked by `npm run check`.
 11. Pull requests that change only `.md` files skip the Tests check. If that check is made required in branch protection, such pull requests cannot merge.
 12. Docs dates and CHANGELOG hashes before 2026-10-31 were reconstructed from git history.
+13. The "Workers Builds: electric-kitchen" check fails within a second on pull request branches, before any build step runs. Production builds from `main` work. The cause is in the Cloudflare build settings for non production branches and is not visible from the repository.
 
 ## 16. Audit guide
 

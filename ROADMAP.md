@@ -46,6 +46,6 @@
 
 ## Operations to do
 
-1. Confirm the 2026-10-31 deploy finished and `0003_california_kitchens.sql` ran in production.
-2. Fill in DEPLOY.md section 8 TODOs.
+1. Fill in DEPLOY.md section 8 TODOs.
+2. Find out why the Workers Builds check fails on pull request branches (see TECHNICAL.md "Known limitations").
 3. Decide whether to make the **Tests** check required in branch protection on `main`.

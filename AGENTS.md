@@ -36,7 +36,7 @@ The code in the repository is the source of truth.
 6. **2026-10-31** First real data. Two approved and five pending California kitchens (`migrations/0003_california_kitchens.sql`).
 7. **2026-10-31** Repository structure. Database calls moved into `src/lib/server/data.ts`. Pure rules in `src/lib/rules.ts`. Vitest tests in `tests/`. CI in `.github/workflows/test.yml`.
 
-Migrations: the latest file is `0003_california_kitchens.sql`. TODO: confirm it was applied in production (see DEPLOY.md section 8). The next migration is **0004**.
+Migrations: the latest file is `0003_california_kitchens.sql`, applied in production on 2026-10-31 (see DEPLOY.md section 8). The next migration is **0004**.
 
 ## Stack
 
