@@ -1,6 +1,7 @@
 import * as maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { el, place, type Kitchen } from '../lib/shared';
+import { currentTheme, onThemeChange } from './theme';
 
 maplibregl.setWorkerUrl('/maplibre/maplibre-gl-worker.mjs');
 
@@ -8,7 +9,7 @@ const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)'
 
 const OSM_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
 const NASA_ATTRIBUTION = '<a href="https://earthdata.nasa.gov/gibs">NASA GIBS</a>';
-const darkMode = () => window.matchMedia('(prefers-color-scheme: dark)').matches;
+const darkMode = () => currentTheme() === 'dark';
 
 // The glow around the globe. Pale in light mode, deeper blue in dark mode.
 const sky = (dark: boolean) => ({
@@ -68,7 +69,7 @@ function createMap(container: HTMLElement, globe: boolean, center: [number, numb
       map.setLayerZoomRange('streets', 0, 24);
       map.setPaintProperty('streets', 'raster-opacity', 1);
     });
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => map.setSky(sky(darkMode()) as any));
+    onThemeChange(() => map.setSky(sky(darkMode()) as any));
   }
   return map;
 }
