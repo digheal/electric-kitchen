@@ -51,6 +51,7 @@ Pages load data in the browser by calling the JSON API (`fetchKitchens` in `src/
 | `src/pages/` | Astro pages (this project's equivalent of `src/app/`). |
 | `src/layouts/Base.astro` | Shared page shell and global CSS. |
 | `src/scripts/map.ts`, `src/scripts/grid.ts` | Client scripts for maps and the hero animation. |
+| `src/scripts/theme.ts` | Light and dark mode: `setupThemeToggle`, `currentTheme`, `onThemeChange`. |
 | `migrations/` | Numbered D1 migrations, applied by Wrangler. |
 | `scripts/` | `copy-maplibre-worker.mjs` (runs before build and dev), `check-secrets.mjs`. |
 | `tests/` | One Vitest file per lib module, plus `db-boundary.test.ts`. |
@@ -126,7 +127,11 @@ The only access rule is that public queries return approved rows only (`kitchenQ
 
 `src/pages/kitchen/index.astro` reads `id` from the query string, checks it against `^\d+$`, fetches `/api/kitchens/:id`, and renders facts, equipment, notes and a small map (`showKitchenMap`).
 
-### 7.5 Adding and approving kitchens
+### 7.5 Light and dark mode
+
+Colors are CSS custom properties on `:root` in `src/layouts/Base.astro`, with dark values under `:root[data-theme="dark"]`. An inline script in `<head>` sets `data-theme` before the first paint, from the saved choice in `localStorage` key `theme` or else from `prefers-color-scheme`. `setupThemeToggle` in `src/scripts/theme.ts` runs the header button `#theme-toggle` (`aria-pressed` is true in dark mode), saves the choice, follows device changes until a choice is saved, and fires a `themechange` event on `document`. `onThemeChange` lets the globe update its sky (`createMap` in `src/scripts/map.ts`). The hero grid reads `--accent` while drawing, so it follows without a listener. Storage errors are caught, so blocked storage only means the choice is not remembered.
+
+### 7.6 Adding and approving kitchens
 
 There is no submission form or admin screen. Kitchens are added by new migration files (as in `0003_california_kitchens.sql`) or by SQL run through Wrangler. A row becomes public when `status` is `approved`.
 
@@ -202,6 +207,7 @@ Not covered by automated tests: `el` and `kitchenCard` (need a DOM), the Astro p
 11. Pull requests that change only `.md` files skip the Tests check. If that check is made required in branch protection, such pull requests cannot merge.
 12. Docs dates and CHANGELOG hashes before 2026-10-31 were reconstructed from git history.
 13. The "Workers Builds: electric-kitchen" check fails within a second on pull request branches, before any build step runs. Production builds from `main` work. The cause is in the Cloudflare build settings for non production branches and is not visible from the repository.
+14. Without JavaScript the site shows light mode only, because `data-theme` is set by script.
 
 ## 16. Audit guide
 

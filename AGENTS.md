@@ -34,7 +34,8 @@ The code in the repository is the source of truth.
 4. **2026-10-29** Browse page (`src/pages/browse/index.astro`) with search, type, region, equipment and sort filters. Kitchen detail page (`src/pages/kitchen/index.astro`, `?id=`). Both fetch through `fetchKitchens` and render with `el` and `kitchenCard` in `src/lib/shared.ts`.
 5. **2026-10-31** Home page globe (`src/pages/index.astro`). `showGlobe` and `showKitchenMap` in `src/scripts/map.ts` use MapLibre with NASA GIBS satellite tiles and an OpenStreetMap fallback. `startGrid` in `src/scripts/grid.ts` draws the animated hero grid. Two finger map gestures on touch screens.
 6. **2026-10-31** First real data. Two approved and five pending California kitchens (`migrations/0003_california_kitchens.sql`).
-7. **2026-10-31** Repository structure. Database calls moved into `src/lib/server/data.ts`. Pure rules in `src/lib/rules.ts`. Vitest tests in `tests/`. CI in `.github/workflows/test.yml`.
+7. **2026-11-01** Light and dark mode. Header button `#theme-toggle` in `src/layouts/Base.astro`, run by `setupThemeToggle` in `src/scripts/theme.ts`. An inline script in `<head>` sets `data-theme` before paint. The globe follows through `onThemeChange`.
+8. **2026-10-31** Repository structure. Database calls moved into `src/lib/server/data.ts`. Pure rules in `src/lib/rules.ts`. Vitest tests in `tests/`. CI in `.github/workflows/test.yml`.
 
 Migrations: the latest file is `0003_california_kitchens.sql`, applied in production on 2026-10-31 (see DEPLOY.md section 8). The next migration is **0004**.
 

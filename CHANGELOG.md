@@ -2,6 +2,18 @@
 
 Newest first. Each entry names the commit, who asked and why, what changed and any SQL file to run.
 
+## 2026-11-01
+
+### Light and dark mode toggle `6d36b75`
+
+Owner asked for a light mode and dark mode.
+
+1. Added: header button that switches between light and dark (`src/scripts/theme.ts`, `src/layouts/Base.astro`). It follows the device setting until the visitor picks one, then remembers the choice.
+2. Changed: the globe's glow follows the chosen theme instead of the device setting (`src/scripts/map.ts`).
+3. Fixed: header links stay on one line on narrow phones.
+
+**Database**: none.
+
 ## 2026-10-31
 
 ### Repository structure and working rules `d72394a`
