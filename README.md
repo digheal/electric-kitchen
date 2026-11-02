@@ -1,27 +1,29 @@
-# All-Electric Kitchens Tracker
+# All-Electric Kitchens
 
-A public website listing commercial kitchens that cook without gas.
-Built with Astro and Cloudflare Workers (D1 database, R2 photo storage).
+We are building a public list of commercial kitchens that cook without gas. Restaurants, cafes, school cafeterias, hospitals and other kitchens can all be listed. The goal is simple. We want to show that real kitchens run well on electric equipment like induction ranges, and make them easy to find.
 
-## Run locally
+## What you can do on the site
 
-```bash
-npm install
-npm run preview
-```
+1. Spin a globe and see where each kitchen is.
+2. Browse the full list and filter it by kitchen type, region and equipment.
+3. Open a kitchen's page to see its address, equipment, when it went electric and a short note.
 
-## Deploy
+## How listings get in
 
-Pushes to `main` deploy through Cloudflare Workers Builds.
-The deploy command is `npm run deploy`. It builds the site, applies any new
-database migrations from `migrations/`, then publishes the Worker.
+Every listing is reviewed before it shows up. Right now we add kitchens ourselves, mostly from news coverage, and each note names its source. Kitchens we have not confirmed stay hidden until we check them.
 
-## Sample data
+## Honest limits
 
-`migrations/0002_sample_kitchens.sql` adds five fake kitchens. Remove them before launch.
+1. The list is small. It has a handful of real kitchens so far, all in California.
+2. Some sample entries are still on the site while we build it. They are labeled as not real places and will be removed before launch.
+3. There is no way yet for kitchens to submit themselves. That is planned.
+4. Some map pins sit at the center of a city because we do not have a street address yet.
+5. Details come from public reporting. They can be out of date, so check with a kitchen before relying on them.
 
-## Secrets
+## Who is behind it
 
-This repo is public. Never commit keys, passwords, or private emails.
-Secrets (admin password, Resend key, Turnstile key) live in Cloudflare as
-Worker secrets. For local work, put them in `.dev.vars`, which git ignores.
+TODO: owner to add who runs the site and how to get in touch.
+
+## For developers
+
+Setup, architecture and deployment are covered in the technical docs in this repository.
